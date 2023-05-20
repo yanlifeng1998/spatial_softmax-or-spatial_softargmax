@@ -7,9 +7,20 @@ class Spatial_SoftArgmax(Layer):
 
     def __init__(self):
         super(Spatial_SoftArgmax, self).__init__()
-
+    
+    def build(self, input_shape):
+        self.temperature = self.add_weight(name="temperature",
+                                           shape=(),
+                                           dtype=tf.float32,
+                                           initializer=tf.keras.initializers.ones(),
+                                           trainable=True)
+        super(Spatial_SoftArgmax, self).build(input_shape) 
+    
     def call(self, x):
         _, height, width, channels = x.shape
+        
+        # add temperature coefficient
+        x = x/self.temperature
 
         # Flatten the feature map
         flattened_map = tf.reshape(x, (-1, height * width, channels))
